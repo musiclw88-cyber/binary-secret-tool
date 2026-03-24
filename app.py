@@ -5,7 +5,7 @@ st.set_page_config(page_title="Binary & Unicode Explorer", page_icon="🔐")
 st.title("🔐 Binary & Unicode Explorer")
 st.write("Explore how 'Characters' vs 'Numbers' look inside your M1 Mac.")
 
-text_input = st.text_input("Enter text or a number:", "刘炜")
+text_input = st.text_input("Enter text or a number:")
 
 if text_input:
     col1, col2 = st.columns(2)
