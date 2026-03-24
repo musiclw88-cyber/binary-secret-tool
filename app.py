@@ -22,7 +22,7 @@ if text_input:
             num = int(text_input)
             st.write(f"Treating `{text_input}` as a whole number:")
             st.code(f"Decimal: {num}\nBinary:  {bin(num)}\nHex:     {hex(num)}", language="bash")
-            st.success(f"This is how (num) sits in a CPU register!")
+            st.success(f"This is how" (num) "sits in a CPU register!")
         else:
             st.info("Enter a pure number (like 19) to see the Numeric Mode.")
 
