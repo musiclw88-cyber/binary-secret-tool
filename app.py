@@ -1,41 +1,30 @@
 import streamlit as st
+import numpy as np
 
-st.title("🎨 RGB Bitwise Color Lab")
-st.write("Synthesize colors using Shifts and Masks like a GPU.")
+st.title("🎵 Audio Binary Lab")
+st.write("See how sound waves are sliced into 0s and 1s.")
 
-# 1. 输入三个通道
-col_r, col_g, col_b = st.columns(3)
-with col_r:
-    r = st.slider("Red", 0, 255, 210)
-with col_g:
-    g = st.slider("Green", 0, 255, 100)
-with col_b:
-    b = st.slider("Blue", 0, 255, 50)
+# 1. 调整频率（音调）
+freq = st.slider("Frequency (Hz)", 100, 1000, 440) # 440Hz 是标准音 A
 
-# 2. 位运算合成
-# (R << 16) 把红色推到最前面
-# (G << 8) 把绿色推到中间
-# | (OR) 把它们合并
-combined = (r << 16) | (g << 8) | b
+# 2. 生成 100 个采样点（极短的一瞬间）
+t = np.linspace(0, 0.01, 100)
+# 将波形映射到 16 位整数范围 (-32768 到 32767)
+waveform = (np.sin(2 * np.pi * freq * t) * 32767).astype(np.int16)
 
-st.divider()
+# 3. 画出波形图
+st.line_chart(waveform)
 
-# 3. 展示结果
-hex_color = f"#{combined:06X}"
-st.subheader(f"Final Hex Code: `{hex_color}`")
+# 4. 抽取其中一个点，看它的二进制
+sample_idx = st.number_input("Select a sample point to inspect:", 0, 99, 50)
+sample_val = int(waveform[sample_idx])
 
-# 用这个颜色画一个方块
-st.markdown(
-    f'<div style="background-color:{hex_color}; width:100%; height:100px; border-radius:10px; border:2px solid white;"></div>',
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("Decimal Value", sample_val)
+with col2:
+    # 处理负数的二进制显示 (使用 16 位掩码)
+    st.write("16-bit Binary:")
+    st.code(bin(sample_val & 0xFFFF), language="bash")
 
-# 4. 展示底层的二进制结构
-st.write("### The 24-bit Structure inside Memory:")
-binary_str = bin(combined)[2:].zfill(24)
-r_bin = binary_str[0:8]
-g_bin = binary_str[8:16]
-b_bin = binary_str[16:24]
-
-st.code(f"RED:   {r_bin}\nGREEN: {g_bin}\nBLUE:  {b_bin}", language="bash")
-st.info(f"The CPU sees this as one big integer: {combined}")
+st.info("When you play music, your M1 chip processes millions of these bits every second!")
