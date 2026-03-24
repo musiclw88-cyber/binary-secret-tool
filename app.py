@@ -1,32 +1,41 @@
-# 🔐 Binary Secret Communicator
+import streamlit as st
 
-A lightweight web application built with **Python** and **Streamlit** to explore the relationship between human language and machine-level data (0s and 1s).
+# 页面设置
+st.set_page_config(page_title="Binary & Unicode Explorer", page_icon="🔐")
 
-## 🚀 Overview
-Ever wondered how your name looks inside the memory of an **Apple M1 chip**? This tool translates any text (English, Chinese, or Estonian) into its underlying **Binary** and **Hexadecimal** representations.
+st.title("🔐 Binary & Unicode Explorer")
+st.write("Discover how your name looks inside the memory of an M1 chip.")
 
-### Key Features:
-- **Text to Binary:** Convert strings like "刘炜" or "Tallinn" into 0b... sequences.
-- **Binary to Text:** Decode raw binary strings back into human-readable characters.
-- **Unicode Mapping:** Visualizes how different characters require different memory sizes.
+# 使用 Tabs 让界面更整洁
+tab1, tab2 = st.tabs(["Encode (Text to 0101)", "Decode (0101 to Text)"])
 
-## 🛠️ Tech Stack
-- **Language:** Python 3.x
-- **Framework:** [Streamlit](https://streamlit.io/)
-- **Encoding:** Unicode (UTF-8)
+with tab1:
+    text_input = st.text_input("Enter text (English, Chinese, or Estonian):", "刘炜")
+    if text_input:
+        # 获取二进制 (Binary)
+        binary_output = " ".join([bin(ord(c)) for c in text_input])
+        # 获取十六进制 (Hex)
+        hex_output = " ".join([hex(ord(c)) for c in text_input])
+        # 计算字节数 (Bytes) - UTF-8 编码下汉字通常占 3 字节
+        byte_count = len(text_input.encode('utf-8'))
+        
+        st.subheader("Results:")
+        st.write("**Binary (0b...):**")
+        st.code(binary_output, language="bash")
+        
+        st.write("**Hexadecimal (0x...):**")
+        st.code(hex_output, language="bash")
+        
+        st.info(f"💡 Memory Tip: '{text_input}' takes up **{byte_count} bytes** in UTF-8 memory.")
 
-## 📖 How it Works
-Computers don't understand "A" or "刘". They use a "lookup table" called **Unicode**:
-1. The character **'A'** is mapped to the number **65**, which is `0b1000001`.
-2. The character **'刘'** is mapped to the number **21016**, which is `0b101001000011000`.
+with tab2:
+    binary_input = st.text_area("Paste binary code (starting with 0b, separated by spaces):")
+    if st.button("Decode Now"):
+        try:
+            decoded_text = "".join([chr(int(b, 2)) for b in binary_input.split()])
+            st.success(f"Decoded Text: **{decoded_text}**")
+        except:
+            st.error("Format Error! Make sure it looks like '0b10101... 0b1100...'")
 
-This app acts as the "microscope" to see those raw bits in action.
-
-## 🚦 Quick Start
-If you want to run this locally on your Mac:
-1. Clone the repo.
-2. Install requirements: `pip install streamlit`
-3. Run the app: `streamlit run app.py`
-
----
-*Created as part of my journey into AI and Computer Architecture.*
+st.divider()
+st.caption("Built in Tallinn | Exploring Computer Architecture")
