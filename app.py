@@ -1,47 +1,41 @@
 import streamlit as st
 
-st.set_page_config(page_title="Binary & Hex Lab", page_icon="✂️")
+st.title("🎨 RGB Bitwise Color Lab")
+st.write("Synthesize colors using Shifts and Masks like a GPU.")
 
-st.title("✂️ The 'Four-Bit Cut' Lab")
-st.write("See how your M1 Mac groups 0s and 1s into Hexadecimal.")
+# 1. 输入三个通道
+col_r, col_g, col_b = st.columns(3)
+with col_r:
+    r = st.slider("Red", 0, 255, 210)
+with col_g:
+    g = st.slider("Green", 0, 255, 100)
+with col_b:
+    b = st.slider("Blue", 0, 255, 50)
 
-# 用户输入原始二进制流
-raw_binary = st.text_input("Paste a string of 0s and 1s (e.g., 11100101):", "111001011000100010011000")
+# 2. 位运算合成
+# (R << 16) 把红色推到最前面
+# (G << 8) 把绿色推到中间
+# | (OR) 把它们合并
+combined = (r << 16) | (g << 8) | b
 
-# 过滤掉非 0/1 字符
-clean_binary = "".join([c for c in raw_binary if c in "01"])
+st.divider()
 
-if clean_binary:
-    # 1. 自动补齐 (Padding)：为了每 4 位一刀，前面可能需要补 0
-    padding_needed = (4 - len(clean_binary) % 4) % 4
-    padded_binary = "0" * padding_needed + clean_binary
-    
-    st.subheader("Step 1: Alignment & Padding")
-    st.write(f"Original length: {len(clean_binary)} bits")
-    if padding_needed > 0:
-        st.warning(f"Added {padding_needed} zero(s) to the front to make it divisible by 4.")
-    st.code(padded_binary, language="bash")
+# 3. 展示结果
+hex_color = f"#{combined:06X}"
+st.subheader(f"Final Hex Code: `{hex_color}`")
 
-    # 2. 四位一刀切
-    st.subheader("Step 2: The 'Four-Bit Cut'")
-    groups = [padded_binary[i:i+4] for i in range(0, len(padded_binary), 4)]
-    
-    # 建立一个漂亮的显示界面
-    cols = st.columns(len(groups))
-    hex_result = "0x"
-    
-    for i, group in enumerate(groups):
-        with cols[i]:
-            # 计算这一组的十六进制
-            hex_char = hex(int(group, 2))[2:].upper()
-            hex_result += hex_char
-            
-            st.info(f"Group {i+1}")
-            st.code(group)
-            st.write(f"**→ {hex_char}**")
-            
-    # 3. 最终结果
-    st.success(f"### Final Hexadecimal: `{hex_result}`")
-    st.caption("Developed by Liu Wei | Learning the 'Speedy Shorthand' of M1 Architecture")
-else:
-    st.info("Please enter some binary (0 or 1) to start cutting!")
+# 用这个颜色画一个方块
+st.markdown(
+    f'<div style="background-color:{hex_color}; width:100%; height:100px; border-radius:10px; border:2px solid white;"></div>',
+    unsafe_allow_html=True
+)
+
+# 4. 展示底层的二进制结构
+st.write("### The 24-bit Structure inside Memory:")
+binary_str = bin(combined)[2:].zfill(24)
+r_bin = binary_str[0:8]
+g_bin = binary_str[8:16]
+b_bin = binary_str[16:24]
+
+st.code(f"RED:   {r_bin}\nGREEN: {g_bin}\nBLUE:  {b_bin}", language="bash")
+st.info(f"The CPU sees this as one big integer: {combined}")
