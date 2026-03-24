@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(page_title="Binary & Unicode Explorer", page_icon="🔐")
 
 st.title("🔐 Binary & Unicode Explorer")
-st.write("Explore how 'Characters' vs 'Numbers' look inside your M1 Mac.")
+st.write("Explore how 'Characters' vs 'Numbers' look inside CPU.")
 
 text_input = st.text_input("Enter text or a number:")
 
@@ -31,7 +31,7 @@ if text_input:
             st.write(f"Treating `{text_input}` as a whole integer:")
             st.code(f"Decimal: {num}\nBinary:  {binary_str}\nHex:     {hex(num)}", language="bash")
             
-            st.success(f"This is how ({num}) sits in a CPU register!")
+            st.success(f"This is how {num} sits in a CPU register!")
             st.metric("Memory Usage", f"{bits_needed} Bits")
         else:
             st.warning("Numeric Mode is only for pure numbers (0-9).")
